@@ -1,7 +1,5 @@
-// Raspberry pi 4 model case by Chema Dominguez based on George Onoufriou (Raven, GeorgeRaven, Archer - C 2019-06-30
-// please see licence in project root https://github.com/DreamingRaven/RavenSCAD/blob/master/LICENSE)
-
-Adding space for 3G Hat and Pivoyager UPS.
+// Raspberry pi 4 model case by George Onoufriou (Raven, GeorgeRaven, Archer) C 2019-06-30
+// please see licence in project root https://github.com/DreamingRaven/RavenSCAD/blob/master/LICENSE
 
 // |-=========---------| <-The back right of the board is the point everything else is relative to
 // | o            o    |
@@ -10,25 +8,24 @@ Adding space for 3G Hat and Pivoyager UPS.
 
 board_thickness = 1.5; // the space for the board itself only
 pin_space = 3;//2.2; // the min space that the throughhole components require underneath
-$fn = 100; // how detailed the circular components are (holes + mounts), not super important
+//$fn = 100; // how detailed the circular components are (holes + mounts), not super important
+$fn = 20; // low detailed for developing. Replace this value to 100 before generating the stl printing model.
 extension = 20; // extension to lengths so case can be subtractiveley created
-inhibitionzone_height = 12; // creates an inhibition zone for surface components
+//inhibitionzone_height = 12; // creates an inhibition zone for surface components
+inhibitionzone_height= 33.5; //inhibition zone for 3g and pivoyager hats
 case_thickness = 2;//2; // sets the case thickness
 pil = 85.5; // this is the length of the pi board only
 pid = 56; // this is the width / depth of the pi board only
 pih = board_thickness;
 sd_height = pin_space + case_thickness + board_thickness; // is how tall the sd card part sticking out is so if you increase it will cut more out for case
-mount_pin_height = 2*board_thickness + 2*case_thickness + pin_space + inhibitionzone_height;//31; // this is the most awkward one of the set as it sets the mount point pin size
+mount_pin_height = 2*board_thickness + 2*case_thickness + pin_space + inhibitionzone_height; // this is the most awkward one of the set as it sets the mount point pin size
 
-// fan mount options
-fan_pin_diam = 3;
-fan_position_x = 44.3; // the offset of the fan from the right
-fan_position_y = 14; // the offset of the fan from the top
-fan_pin_distance = 31.5; // the distance between the mount holes
-
+// Added Space For Battery And Hats
+battd = 20; //width / depth space for battery
+intrabatth = 5; //height of the separation inserted between battery and the raspberry
 
 // uncomment here what you dont want to generate
- translate([0,0,inhibitionzone_height + case_thickness + board_thickness]) rotate([0,180,0]) intersection(){ // top of case
+ translate([-40,0,inhibitionzone_height + case_thickness + board_thickness]) rotate([0,180,0]) intersection(){ // top of case
   rpi4_case();
   topSelector();
 }
@@ -37,35 +34,41 @@ fan_pin_distance = 31.5; // the distance between the mount holes
   topSelector();
 }
 // translate([-pil,pid+case_thickness*2+5]) rpi4_case(); // the whole unsplit case
-translate([extension+17.44,pid+case_thickness*2+5,0]) rpi4(); // the raspberry pi 4 and associated tolerances
-
+translate([extension+17.44+30,pid+case_thickness*2+5,0]) rpi4andbatt(); // the raspberry pi 4 and associated tolerances
 
 // here follows all the modules used to generate what you want.
 module topSelector()
 {
   difference(){ // this difference selects the top and bottom parts of the case with a small lip for the IO
-    translate([-case_thickness,0,0]) cube([pil+2*case_thickness,pid,pin_space+inhibitionzone_height+case_thickness]);  // test hull
-    translate([-case_thickness,0,0]) cube([case_thickness,pid,board_thickness]);
+    translate([-case_thickness,0,0]) cube([pil+2*case_thickness,pid+battd+case_thickness,pin_space+inhibitionzone_height+case_thickness]);  // test hull
+    translate([-case_thickness,0,0]) cube([case_thickness,pid+battd+case_thickness,board_thickness]);
   }
 }
-
 
 module rpi4_case()
 {
   difference(){ // subtracts the rpi4 model from a cube to generate the case
     translate([-case_thickness,-case_thickness,-(case_thickness + pin_space)])
     cube([pil+(2*case_thickness),
-      pid+(2*case_thickness),
+      pid+battd+(3*case_thickness),
       pin_space+inhibitionzone_height+board_thickness+(2*case_thickness)]); // the case itself
-    union(){
-      rpi4();
-      pins(); // generating the pins themselves so the holes can be inhibited
+    translate([0,(battd+case_thickness),0]) {
+        union(){
+            rpi4andbatt();
+            pins(); // generating the pins themselves so the holes can be inhibited
+        }
     }
   }
 }
-
+module rpi4andbatt(){ //this module adds the space battery
+  union(){
+    rpi4();
+    translate([intrabatth,-case_thickness,0]) 
+        cube([(pil-2*intrabatth),case_thickness,(inhibitionzone_height+board_thickness-intrabatth)]);
+    translate([0,-(battd+case_thickness),-pin_space]) cube([pil,battd,pin_space+inhibitionzone_height+board_thickness]);            
+  }
+}
 module rpi4(){
-
   difference(){ // this creates the mount holes
     translate([0,0,board_thickness]){ // two translations cancel out but make maths simpler before they do
       translate([0,0,-(board_thickness)]) // the translation which ^ cancels out
@@ -87,18 +90,23 @@ module rpi4(){
       translate([37.4,34.1,0]) cube([2.5,22.15,5.4+extension]);                 // CSI camera connector
       translate([26.9,43.55,0]) cube([8.5,14.95+extension,6.9]);                  // Audio jack
       translate([85,22.4,-(board_thickness+sd_height)]) cube([2.55+extension,11.11,sd_height]); // SD card (poking out)
-    //translate([fan_position_x,fan_position_y,0]) cylinder(extension,d=fan_pin_diam, center=false);                            // fan mount top-r
-    //translate([fan_position_x,fan_position_y+fan_pin_distance,0]) cylinder(extension,d=fan_pin_diam, center=false);                 // fan mount bot-r
-    //translate([fan_position_x+fan_pin_distance,fan_position_y,0]) cylinder(extension,d=fan_pin_diam, center=false);                 // fan mount top-l
-    //translate([fan_position_x+fan_pin_distance,fan_position_y+fan_pin_distance,0]) cylinder(extension,d=fan_pin_diam, center=false);      // fan mount bot-l
-    //translate([fan_position_x+0.5*fan_pin_distance,fan_position_y+0.5*fan_pin_distance,0]) cylinder(extension,d=fan_pin_distance+fan_pin_diam, center=false);      // fan air hole
       translate([53,7.8,0]){ scale([10,1,1]){
-
         translate([0,0,-extension-board_thickness-pin_space])  cylinder(extension,d=5, center=false);      // under-side air hole
-        translate([0,10,-extension-board_thickness-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
-        translate([0,20,-extension-board_thickness-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
-        translate([0,30,-extension-board_thickness-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
         translate([0,40,-extension-board_thickness-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
+        translate([0,0,inhibitionzone_height])  cylinder(extension,d=5, center=false);      // over-side air hole
+        translate([0,40,inhibitionzone_height]) cylinder(extension,d=5, center=false);      // over-side air hole
+      };
+      scale([15,1,1]){
+        translate([-0.6,10,-extension-board_thickness-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
+        translate([-0.6,20,-extension-board_thickness-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
+        translate([-0.6,30,-extension-board_thickness-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
+        translate([-0.6,-15,-extension-board_thickness-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
+        translate([-0.6,-24,-extension-board_thickness-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
+        translate([-0.6,10,inhibitionzone_height]) cylinder(extension,d=5, center=false);      // over-side air hole
+        translate([-0.6,20,inhibitionzone_height]) cylinder(extension,d=5, center=false);      // over-side air hole
+        translate([-0.6,30,inhibitionzone_height]) cylinder(extension,d=5, center=false);      // over-side air hole
+        translate([-0.6,-15,inhibitionzone_height]) cylinder(extension,d=5, center=false);      // under-side air hole
+        translate([-0.6,-24,inhibitionzone_height]) cylinder(extension,d=5, center=false);      // under-side air hole
       }
       }
 

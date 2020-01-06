@@ -22,17 +22,14 @@ mount_pin_height = 2*board_thickness + 2*case_thickness + pin_space + inhibition
 
 // Added Space For Battery And Hats
 battd = 20; //width / depth space for battery
+upscardd = 30; //the UPS board width / depth
 intrabatth = 5; //height of the separation inserted between battery and the raspberry
+x_to_avoid_antenna_conn = 31;
+inhibitionzone_height_noups =20;
 
 // uncomment here what you dont want to generate
- translate([-40,0,inhibitionzone_height + case_thickness + board_thickness]) rotate([0,180,0]) intersection(){ // top of case
-  rpi4_case();
-  topSelector();
-}
- translate([30,0,case_thickness]) rotate([0,-90,0]) difference(){ // bottom of case
-  rpi4_case();
-  topSelector();
-}
+ translate([-40,0,inhibitionzone_height + case_thickness + board_thickness]) rotate([0,180,0]) intersection(){rpi4_case(); topSelector();} // top of case
+ translate([30,0,case_thickness]) rotate([0,-90,0]) difference(){rpi4_case(); topSelector(); } // bottom of case
 // translate([-pil,pid+case_thickness*2+5]) rpi4_case(); // the whole unsplit case
 translate([extension+17.44+30,pid+case_thickness*2+5,0]) rpi4andbatt(); // the raspberry pi 4 and associated tolerances
 
@@ -45,13 +42,20 @@ module topSelector()
   }
 }
 
+module basic_case(){ //this is the shell case from that we will substract the rpi model.
+    difference(){ // subtracts the rpi4 model from a cube to generate the case
+      cube([pil+(2*case_thickness),
+        pid+battd+(3*case_thickness),
+        pin_space+inhibitionzone_height+board_thickness+(2*case_thickness)]); // the case itself
+      translate([x_to_avoid_antenna_conn+2*case_thickness,upscardd+battd+(3*case_thickness), pin_space+inhibitionzone_height_noups+board_thickness+(2*case_thickness)]) //avoid the antenna connector
+       cube([pil+(0*case_thickness)-x_to_avoid_antenna_conn,pid-upscardd,inhibitionzone_height-inhibitionzone_height_noups]);
+  }
+}
 module rpi4_case()
 {
   difference(){ // subtracts the rpi4 model from a cube to generate the case
     translate([-case_thickness,-case_thickness,-(case_thickness + pin_space)])
-    cube([pil+(2*case_thickness),
-      pid+battd+(3*case_thickness),
-      pin_space+inhibitionzone_height+board_thickness+(2*case_thickness)]); // the case itself
+    basic_case(); // the case itself
     translate([0,(battd+case_thickness),0]) {
         union(){
             rpi4andbatt();
@@ -61,11 +65,15 @@ module rpi4_case()
   }
 }
 module rpi4andbatt(){ //this module adds the space battery
-  union(){
-    rpi4();
-    translate([intrabatth,-case_thickness,0]) 
+  difference(){
+    union(){
+      rpi4();
+      translate([intrabatth,-case_thickness,0]) 
         cube([(pil-2*intrabatth),case_thickness,(inhibitionzone_height+board_thickness-intrabatth)]);
-    translate([0,-(battd+case_thickness),-pin_space]) cube([pil,battd,pin_space+inhibitionzone_height+board_thickness]);            
+      translate([0,-(battd+case_thickness),-pin_space]) cube([pil,battd,pin_space+inhibitionzone_height+board_thickness]);            
+    }
+      translate([x_to_avoid_antenna_conn,upscardd, inhibitionzone_height_noups+board_thickness]) //avoid the antenna connector
+         cube([pil+(1*case_thickness)-x_to_avoid_antenna_conn,pid-upscardd+case_thickness,inhibitionzone_height-inhibitionzone_height_noups+case_thickness]);
   }
 }
 module rpi4(){
@@ -76,8 +84,8 @@ module rpi4(){
         cube([pil,pid,board_thickness]); // the board only (not the underpins)
       }
       // these are the big surface level components
-      translate([-(2.81+extension),2.15,0]) cube([21.3+extension,16.3,13.6]);   // Ethenrnet port
-      translate([-(2.81+extension),22.6,0]) cube([17.44+extension,13.5,15.6]);  // USB 3.0
+      translate([-(2.81+extension),2.15,0]) cube([21.3+extension,16.3,13.6]);   // Ethernet port
+      translate([-(2.81+extension),22.6,0]) cube([17.44+extension,13.5,24]);    // USB 3.0 + connection to 3G card
       translate([-(2.81+extension),40.6,0]) cube([17.44+extension,13.5,15.6]);  // USB 2.0
       translate([27.36,1,0]) cube([50.7,5.0,8.6+extension]);                    // GPIO pins
       translate([21,7.15,0]) cube([5.0,5.0,8.6+extension]);                     // Power over ethernet pins
@@ -87,8 +95,11 @@ module rpi4(){
       translate([69.1,50,0]) cube([9.7,7.4+extension,3.6]);                     // USB type c power
       translate([55.0,50,0]) cube([7.95,7.8+extension,3.9]);                    // Micro HDMI0
       translate([41.2,50,0]) cube([7.95,7.8+extension,3.9]);                    // Micro HDMI1
-      translate([37.4,34.1,0]) cube([2.5,22.15,5.4+extension]);                 // CSI camera connector
-      translate([26.9,43.55,0]) cube([8.5,14.95+extension,6.9]);                  // Audio jack
+//      translate([37.4,34.1,0]) cube([2.5,22.15,5.4+extension]);                 // CSI camera connector, I dont need this now
+      translate([26.9,43.55,0]) cube([8.5,14.95+extension,6.9]);                // Audio jack
+      translate([42,50,12]) cube([13,7.8+extension,3]);                    // SIM Card slot
+      
+      
       translate([85,22.4,-(board_thickness+sd_height)]) cube([2.55+extension,11.11,sd_height]); // SD card (poking out)
       translate([53,7.8,0]){ scale([10,1,1]){
         translate([0,0,-extension-board_thickness-pin_space])  cylinder(extension,d=5, center=false);      // under-side air hole
@@ -118,7 +129,7 @@ module rpi4(){
         mounts(); // the material which is above and below the board to keep it in place which the pins go through
       }
     } // end of translation cancel
-  pins(); // the hole which will be screwed into to put both halves of the case and board together
+    pins(); // the hole which will be screwed into to put both halves of the case and board together
   }
 }
 

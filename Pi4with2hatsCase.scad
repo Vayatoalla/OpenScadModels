@@ -114,14 +114,15 @@ module rpi4() {
       translate([27.36,1,0]) cube([50.7,5.0,8.6+extension]);                    // GPIO pins
       translate([21,7.15,0]) cube([5.0,5.0,8.6+extension]);                     // Power over ethernet pins
       translate([48.0,16.3,0]) cube([15.0,15.0,2.5]);                           // cpu
-      translate([67.5,6.8,0]) cube([10.8,13.1,1.8]);                            // onboard wifi
+      // translate([67.5,6.8,0]) cube([10.8,13.1,1.8]);                         // onboard wifi
       translate([79,17.3,0]) cube([2.5,22.15,5.4+extension]);                   // display connector
       translate([69.1,50,0]) cube([9.7,7.4+extension,3.6]);                     // USB type c power
       translate([55.0,50,0]) cube([7.95,7.8+extension,3.9]);                    // Micro HDMI0
       translate([41.2,50,0]) cube([7.95,7.8+extension,3.9]);                    // Micro HDMI1
-      //      translate([37.4,34.1,0]) cube([2.5,22.15,5.4+extension]);                 // CSI camera connector, I dont need this now
+      //      translate([37.4,34.1,0]) cube([2.5,22.15,5.4+extension]);         // CSI camera connector, I dont need here
       translate([26.9,43.55,0]) cube([8.5,14.95+extension,6.9]);                // Audio jack
-      translate([42,50,12]) cube([13,7.8+extension,3]);                    // SIM Card slot
+      translate([42,50,12]) cube([13,7.8+extension,3]);                         // SIM Card slot       
+      translate([pil,7,boardw2hat_thickness-board_thickness]) cube([extension,3,1.5]);  // UPS button, same height of UPS USB connector
             
       translate([85,22.4,-(board_thickness+sd_height)]) cube([2.55+extension,11.11,sd_height]); // SD card (poking out)
 
@@ -149,6 +150,8 @@ module rpi4() {
       pins(); // the hole which will be screwed into to put both halves of the case and board together
     }
   }
+  
+  translate([32,upscardd,boardw2hat_thickness]) cube([7.5,7.8+extension,3.7]);    // UPS-USB connector, must be after the corner difference 
   translate([53,7.8,0]) { // the air holes dont need the first translate and must be after the ups connector corner difference.
     translate([0,-2,inhibitionzone_height])  cylinder(extension,d=5, center=false);      // over-side air hole
     scale([10,1,1]){ // scale 10 of d=5 moves 12.5 less than scale 15
@@ -156,22 +159,25 @@ module rpi4() {
       translate([0,40,-extension-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
       translate([0,-2,inhibitionzone_height])  cylinder(extension,d=5, center=false);      // over-side air hole
     }
-    scale([15,1,1]) {
-      translate([-0.6,-24,-extension-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
-      translate([-0.6,-15,-extension-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
-      translate([-0.6,10,-extension-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
-      translate([-0.6,20,-extension-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
-      translate([-0.6,30,-extension-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
+    scale([15,1,1]) {      // under-side air hole
+      translate([-0.6,-24,-extension-pin_space]) cylinder(extension,d=5, center=false);
+      translate([-0.6,-15,-extension-pin_space]) cylinder(extension,d=5, center=false);
+      translate([-0.6,10,-extension-pin_space]) cylinder(extension,d=5, center=false);
+      translate([-0.6,20,-extension-pin_space]) cylinder(extension,d=5, center=false);
+      translate([-0.6,30,-extension-pin_space]) cylinder(extension,d=5, center=false);
     }
-    scale([12,1,1]) {
-      translate([0,-22,inhibitionzone_height]) cylinder(extension,d=5, center=false);      // over-side air hole
-      translate([0,-12,inhibitionzone_height]) cylinder(extension,d=5, center=false);      // over-side air hole
-      translate([0,8,inhibitionzone_height]) cylinder(extension,d=5, center=false);      // over-side air hole
-      translate([0,18,inhibitionzone_height]) cylinder(extension,d=5, center=false);      // over-side air hole
+    scale([12,1,1]) {      // over-side air hole
+      translate([0,-22,inhibitionzone_height]) cylinder(extension,d=5, center=false);
+      translate([0,-12,inhibitionzone_height]) cylinder(extension,d=5, center=false);
+      translate([0,8,inhibitionzone_height]) cylinder(extension,d=5, center=false);
+      translate([0,18,inhibitionzone_height]) cylinder(extension,d=5, center=false);
     }
-    scale([9,1,1]) {
-      translate([0.5,30,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
-      translate([0.5,40,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);      // over-side air hole
+    scale([0.9,4,1]) {  //over-side under UPS step
+      translate([-15,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
+      translate([-5,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
+      translate([5.5,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
+      translate([15,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
+      translate([25.5,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false); 
     }
   }
   translate([3,y_antenna_eth_conn,inhibitionzone_height])  cylinder(extension,d=9, center=false);

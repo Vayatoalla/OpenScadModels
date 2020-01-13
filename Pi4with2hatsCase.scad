@@ -34,12 +34,12 @@ x_to_avoid_antenna_conn = 31;
 y_antenna_eth_conn = 9; //y axis of the antenna over the eth port (both antennas are symetrical in the y axis).
 inhibitionzone_height_noups =20;
 
-// uncomment here what you dont want to generate
+// comment here what you dont want to generate
  translate([-40,0,inhibitionzone_height + case_thickness + board_thickness]) rotate([0,180,0]) intersection(){rpi4_case(); topSelector();} // top of case
- translate([30,0,case_thickness]) rotate([0,-90,0]) difference(){rpi4_case(); topSelector(); } // bottom of case
+ translate([-90,120,case_thickness]) rotate([0,0,0]) difference(){rpi4_case(); topSelector(); } // bottom of case
 // translate([-pil,pid+case_thickness*2+5]) rpi4_case(); // the whole unsplit case
 translate([extension+17.44+30,pid+case_thickness*2+5,0]) rpi4andbatt(); // the raspberry pi 4 and associated tolerances
-translate([200,200,0]) topSelector();
+//translate([200,200,0]) topSelector();
 // here follows all the modules used to generate what you want.
 module topSelector()
 {
@@ -121,10 +121,15 @@ module rpi4() {
       translate([41.2,50,0]) cube([7.95,7.8+extension,3.9]);                    // Micro HDMI1
       //      translate([37.4,34.1,0]) cube([2.5,22.15,5.4+extension]);         // CSI camera connector, I dont need here
       translate([26.9,43.55,0]) cube([8.5,14.95+extension,6.9]);                // Audio jack
-      translate([42,50,12]) cube([13,7.8+extension,3]);                         // SIM Card slot       
+      translate([42,50,14.5]) cube([13,7.8+extension,3]);                         // SIM Card slot       
       translate([pil,7,boardw2hat_thickness-board_thickness]) cube([extension,3,1.5]);  // UPS button, same height of UPS USB connector
             
       translate([85,22.4,-(board_thickness+sd_height)]) cube([2.55+extension,11.11,sd_height]); // SD card (poking out)
+      // Batt side holes
+      holepacing=14;
+      for (n=[0:4]) {
+        translate([14+n*holepacing,-battd,inhibitionzone_height/2]) rotate([90,30,0]) scale([1,5,1]) cylinder(extension, d=5, center=false);
+      }
 
       difference() { // this creates the mount points around the mount holes esp the underneath ones
         union() {
@@ -159,12 +164,9 @@ module rpi4() {
       translate([0,40,-extension-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
       translate([0,-2,inhibitionzone_height])  cylinder(extension,d=5, center=false);      // over-side air hole
     }
-    scale([15,1,1]) {      // under-side air hole
-      translate([-0.6,-24,-extension-pin_space]) cylinder(extension,d=5, center=false);
-      translate([-0.6,-15,-extension-pin_space]) cylinder(extension,d=5, center=false);
-      translate([-0.6,10,-extension-pin_space]) cylinder(extension,d=5, center=false);
-      translate([-0.6,20,-extension-pin_space]) cylinder(extension,d=5, center=false);
-      translate([-0.6,30,-extension-pin_space]) cylinder(extension,d=5, center=false);
+    holepacing=10;
+    scale([15,1,1]) for (n=[0:2]) {      // under-side air hole
+      translate([-0.6,10+holepacing*n,-extension-pin_space]) cylinder(extension,d=5, center=false);
     }
     scale([12,1,1]) {      // over-side air hole
       translate([0,-22,inhibitionzone_height]) cylinder(extension,d=5, center=false);
@@ -172,12 +174,9 @@ module rpi4() {
       translate([0,8,inhibitionzone_height]) cylinder(extension,d=5, center=false);
       translate([0,18,inhibitionzone_height]) cylinder(extension,d=5, center=false);
     }
-    scale([0.9,4,1]) {  //over-side under UPS step
-      translate([-15,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
-      translate([-5,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
-      translate([5.5,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
-      translate([15,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
-      translate([25.5,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false); 
+    holepacing=10;
+    scale([0.9,4,1]) for (n=[0:4]) { //over-side under UPS step      
+      translate([-15+n*holepacing,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
     }
   }
   translate([3,y_antenna_eth_conn,inhibitionzone_height])  cylinder(extension,d=9, center=false);

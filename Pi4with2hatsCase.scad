@@ -37,9 +37,9 @@ inhibitionzone_height_noups =20;
 
 // comment here what you dont want to generate
  translate([-40,0,inhibitionzone_height + case_thickness + board_thickness]) rotate([0,180,0]) intersection(){rpi4_case(); topSelector();} // top of case
- translate([-90,120,case_thickness]) rotate([0,0,0]) difference(){rpi4_case(); topSelector(); } // bottom of case
+ //translate([-90,120,case_thickness]) rotate([0,0,0]) difference(){rpi4_case(); topSelector(); } // bottom of case
 // translate([-pil,pid+case_thickness*2+5]) rpi4_case(); // the whole unsplit case
-translate([extension+17.44+30,pid+case_thickness*2+5,0]) rpi4andbatt(); // the raspberry pi 4 and associated tolerances
+//translate([extension+17.44+30,pid+case_thickness*2+5,0]) rpi4andbatt(); // the raspberry pi 4 and associated tolerances
 //translate([200,200,0]) topSelector();
 // here follows all the modules used to generate what you want.
 module topSelector()
@@ -112,19 +112,20 @@ module rpi4() {
       translate([48.0,16.3,0]) cube([15.0,15.0,2.5]);                           // cpu
       // translate([67.5,6.8,0]) cube([10.8,13.1,1.8]);                         // onboard wifi
       translate([79,17.3,0]) cube([2.5,22.15,5.4+extension]);                   // display connector
-      translate([69.1,50,0]) cube([9.7,7.4+extension,3.6]);                     // USB type c power
-      translate([55.0,50,0]) cube([7.95,7.8+extension,3.9]);                    // Micro HDMI0
-      translate([41.2,50,0]) cube([7.95,7.8+extension,3.9]);                    // Micro HDMI1
+      translate([69.1,pid,0]) cube([9.7,extension,3.6]);                     // USB type c power
+      translate([55.0,pid,0]) cube([7.95,extension,3.9]);                    // Micro HDMI0
+      translate([41.2,pid,0]) cube([7.95,extension,3.9]);                    // Micro HDMI1
       //      translate([37.4,34.1,0]) cube([2.5,22.15,5.4+extension]);         // CSI camera connector, I dont need here
-      translate([26.9,43.55,0]) cube([8.5,14.95+extension,6.9]);                // Audio jack
+      translate([26.9,pid,0]) cube([8.5,extension,6.9]);                // Audio jack
     // other components (not surface ones)
-      translate([42,50,14.5]) cube([13,7.8+extension,3]);                         // SIM Card slot       
+      translate([42,pid,14.5]) cube([13,extension,3]);                         // SIM Card slot       
       translate([pil,7,boardw2hat_thickness-board_thickness]) cube([extension,3,1.5]);  // UPS button, height similar to UPS USB connector            
-      translate([85,22.4,-(board_thickness+sd_height)]) cube([2.55+extension,11.11,sd_height]); // SD card (poking out)
+      translate([pil,22.4,-(board_thickness+sd_height)]) cube([extension,11.11,sd_height]); // SD card (poking out)
     // Batt side holes
-      holepacing=14;
-      for (n=[0:4]) {
-        translate([14+n*holepacing,-battd,inhibitionzone_height/2]) rotate([90,30,0]) scale([1,5,1]) cylinder(extension, d=5, center=false);
+      holepacing3=14;
+      for (n=[0:4]) { // lateral holes
+        translate([14+n*holepacing3,-battd,inhibitionzone_height/2]) rotate([90,30,0]) scale([1,5,1]) cylinder(extension, d=5, center=false);
+      translate([14,pid,inhibitionzone_height/2]) rotate([270,30,0]) scale([1,5,1]) cylinder(extension, d=5, center=false);
       }
     // Under and below big spaces
       difference() { // this creates the mount points around the mount holes esp the underneath ones
@@ -158,17 +159,17 @@ module rpi4() {
       translate([0,40,-extension-pin_space]) cylinder(extension,d=5, center=false);      // under-side air hole
       translate([0,-4,inhibitionzone_height])  cylinder(extension,d=5, center=false);      // over-side middle (little) air hole
     }
-    holepacing=10;
+    holepacing1=10;
     scale([15,1,1]) for (n=[0:2]) {      // under-side air holes
-      translate([-0.6,10+holepacing*n,-extension-pin_space]) cylinder(extension,d=5, center=false);
+      translate([-0.6,10+holepacing1*n,-extension-pin_space]) cylinder(extension,d=5, center=false);
     }
     scale([12,1,1]) {      // over-side air holes
       for (n=[0:1]) translate([0,-25+10*n,inhibitionzone_height]) cylinder(extension,d=5, center=false);
       for (n=[0:1]) translate([0,6+10*n,inhibitionzone_height]) cylinder(extension,d=5, center=false);
       }    
-    holepacing=10;
+    holepacing2=10;
     scale([0.9,4,1]) for (n=[0:4]) { //over-side under UPS step      
-      translate([-15+n*holepacing,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
+      translate([-15+n*holepacing2,9,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
     }
   }
   // antenna holes

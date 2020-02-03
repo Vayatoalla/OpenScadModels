@@ -9,48 +9,48 @@
 // | o            o    |
 // | o            o    |
 // ||_|----------------|
-
-board_thickness = 1.5; // the space for the board itself only
-boardw1hat_thickness = 15; // the space of the rpi board with the first hat
-boardw2hat_thickness = 28; // the space of the rpi board with two hats
-inhibitionzone_height_noups =boardw2hat_thickness-board_thickness;
-pin_space = 3;//2.2; // the min space that the throughhole components require underneath - Height of the mounts (up and down)
-//$fn = 100; // how detailed the circular components are (holes + mounts), not super important
-$fn = 20; // low detailed for developing. Replace this value to 100 before generating the stl printing model.
-extension = 20; // extension to lengths so case can be subtractiveley created
-inhibitionzone_height= 33.5; //inhibition zone for 3g and pivoyager hats
-case_thickness = 2; // sets the case thickness
-pil = 85.5; // this is the length of the pi board only
-pid = 56; // this is the width / depth of the pi board only
-pih = board_thickness;
-sd_height = pin_space + case_thickness + board_thickness; // is how tall the sd card part sticking out is so if you increase it will cut more out for case
-mount_pin_height = 2*board_thickness + 2*case_thickness + pin_space + inhibitionzone_height; // this is the most awkward one of the set as it sets the mount point pin size
-// I want a rounded box. I will achieve it using Minkowsky addition
-mink_functs_height = 0.5; //the height we are using in the cylinders, in Minkowsky functions. Not importante, only keep low
-case_int_radio = 3; //internal radio or the cases corner. Used in Minkowsky functions
-nuts_height = 2; //the height of the nuts holes (and the screw heads)
-// Added Space For Battery And Hats
-battd = 20; //width / depth space for battery
-upscardd = 29.5; //the UPS board width / depth
-eth_height = 13.6;
-usbs_height = 15.6;
-intrabatth = 5; //height of the separation inserted between battery and the raspberry
-y_antenna_eth_conn = 9; //y axis of the antenna over the eth port (both antennas are symetrical in the y axis).
-x_to_first_mount_center = 22.2;
-mount_diameter = 7;
-screw_head_diam = 5; // screw head hole, will be over the case
-x_step_begin = x_to_first_mount_center-screw_head_diam/2; //the UPS USB step initial point is just before screw hole
-antennabigradio = 5;
-antennalittlediameter = 9;
+//Variables
+  board_thickness = 1.5; // the space for the board itself only
+  boardw1hat_thickness = 15; // the space of the rpi board with the first hat
+  boardw2hat_thickness = 28; // the space of the rpi board with two hats
+  inhibitionzone_height_noups =boardw2hat_thickness-board_thickness;
+  pin_space = 3;//2.2; // the min space that the throughhole components require underneath - Height of the mounts (up and down)
+  $fn = 100; // how detailed the circular components are (holes + mounts), not super important
+  //$fn = 20; // low detailed for developing. Replace this value to 100 before generating the stl printing model.
+  extension = 20; // extension to lengths so case can be subtractiveley created
+  inhibitionzone_height= 33.5; //inhibition zone for 3g and pivoyager hats
+  case_thickness = 2; // sets the case thickness
+  pil = 85.5; // this is the length of the pi board only
+  pid = 56; // this is the width / depth of the pi board only
+  pih = board_thickness;
+  sd_height = pin_space + case_thickness + board_thickness; // is how tall the sd card part sticking out is so if you increase it will cut more out for case
+  mount_pin_height = 2*board_thickness + 2*case_thickness + pin_space + inhibitionzone_height; // this is the most awkward one of the set as it sets the mount point pin size
+  // I want a rounded box. I will achieve it using Minkowsky addition
+  mink_functs_height = 0.5; //the height we are using in the cylinders, in Minkowsky functions. Not importante, only keep low
+  case_int_radio = 3; //internal radio or the cases corner. Used in Minkowsky functions
+  nuts_height = 2; //the height of the nuts holes (and the screw heads)
+  // Added Space For Battery And Hats
+  battd = 20; //width / depth space for battery
+  upscardd = 29.5; //the UPS board width / depth
+  eth_height = 13.6;
+  usbs_height = 15.6;
+  intrabatth = 5; //height of the separation inserted between battery and the raspberry
+  y_antenna_eth_conn = 9; //y axis of the antenna over the eth port (both antennas are symetrical in the y axis).
+  x_to_first_mount_center = 22.2;
+  mount_diameter = 7;
+  screw_head_diam = 5; // screw head hole, will be over the case
+  x_step_begin = x_to_first_mount_center-screw_head_diam/2; //the UPS USB step initial point is just before screw hole
+  antennabigradio = 5;
+  antennalittlediameter = 9;
 
 // comment here what you dont want to generate
-translate([-40,0,inhibitionzone_height + case_thickness + board_thickness]) rotate([0,180,0]) intersection(){rpi4_case(); topSelector();} // top of case
-translate([-90,120,case_thickness]) rotate([0,0,0]) difference(){rpi4_case(); topSelector(); } // bottom of case
-//translate([-pil,pid+case_thickness*2+5]) rpi4_case(); // the whole unsplit case
-//translate([extension+17.44+30,pid+case_thickness*2+5,0]) rpi4andbatt(); // the raspberry pi 4 and associated tolerances
-//translate([200,200,0]) topSelector();
-// here follows all the modules used to generate what you want.
-// topSelector();
+  //  translate([-40,0,inhibitionzone_height + case_thickness + board_thickness]) rotate([0,270,0]) intersection(){rpi4_case(); topSelector();} // top of case
+  translate([-40,0,0]) rotate([0,270,0]) intersection(){rpi4_case(); topSelector();} // top of case
+  translate([-90,120,case_thickness]) rotate([0,0,0]) difference(){rpi4_case(); topSelector(); } // bottom of case
+  //translate([-pil,pid+case_thickness*2+5]) rpi4_case(); // the whole unsplit case
+  //translate([extension+17.44+30,pid+case_thickness*2+5,0]) rpi4andbatt(); // the raspberry pi 4 and associated tolerances
+  // here follows all the modules used to generate what you want.
+  // topSelector();
 module topSelector() 
   translate([-case_thickness,0,0]) {
     difference(){ // this difference selects the top and bottom parts of the case with a small lip for the IO
@@ -68,7 +68,7 @@ module topSelector()
       union(){
         cube([case_thickness+2*case_int_radio,18.45+battd+case_thickness,board_thickness+eth_height]); //Over Eth case
         translate([0,18.45+battd+case_thickness,0]) cube([case_thickness+2*case_int_radio,pid+battd-(18.45+battd),board_thickness+usbs_height]); //Over USB case
-        translate([pil+case_thickness-case_int_radio,0,inhibitionzone_height+board_thickness-pin_space]) cube([case_int_radio,case_int_radio,pin_space]);
+        translate([pil+case_thickness-case_int_radio,0,inhibitionzone_height+board_thickness-pin_space-case_thickness]) cube([case_int_radio,case_int_radio,pin_space+case_thickness]); //little correction at end right corner
         }
       }
     translate([0,pid+battd,3.6+board_thickness])

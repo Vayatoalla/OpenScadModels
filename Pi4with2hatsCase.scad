@@ -1,13 +1,4 @@
-// Comments
-  //Bajar 3mm el escalón junto a UPS - Reducirlo 0.5 mm
-  //Reducir 1 mm el hueco junto al Eth
-  //Reducir 0.5 mm el hueco entre USBs
-  //alargar 1 mm la caja
-  //reducir 3 mm la y del botón reset de la voyager. Subirlo 2 mm, y darle 1 mm más de altura
-  //agrandar el agujero de la antena. Debe llegar justo hasta la pared.
-  //elevar 3 mm el agujero de la SD card
-
-  // Openscad model of a Raspberry pi 4 case with space and holes for pivoyager and pilotiog hats.
+  // Openscad model of a Raspberry pi 4 case with space and holes for pivoyager and pilotiot hats.
   // Original file maintained in https://github.com/Vayatoalla/OpenScadModels
   // Based on a design by George Onoufriou (https://github.com/DreamingRaven/RavenSCAD/blob/master/LICENSE)
 
@@ -19,13 +10,13 @@
   board_thickness = 1.5; // the space for the board itself only
   boardw1hat_thickness = 15; // the space of the rpi board with the first hat. Will need it for the holes in the card
   boardw2hat_thickness = 28; // the space of the rpi board with two hats. Will need it for the holes in the card
-  inhibitionzone_height_noups =boardw2hat_thickness-board_thickness-1;
+  inhibitionzone_height_noups =boardw2hat_thickness-board_thickness-4;
   pin_space = 3;//2.2; // the min space that the throughhole components require underneath - Height of the mounts (up and down)
   $fn = 100; // how detailed the circular components are (holes + mounts), not super important
   extension = 20; // extension to lengths so case can be subtractiveley created
   inhibitionzone_height= 34.5; //inhibition zone for 3g and pivoyager hats
   case_thickness = 2; // sets the case thickness
-  pil = 86.5; // this is the length of the pi board only
+  pil = 87; // this is the length of the pi board only
   pid = 57; // this is the width / depth of the pi board only
   pih = board_thickness;
   sd_height = pin_space + case_thickness + board_thickness; // is how tall the sd card part sticking out is so if you increase it will cut more out for case
@@ -45,8 +36,7 @@
   mount_diameter = 7;
   screw_head_diam = 5; // screw head hole, will be over the case
   x_step_begin = x_to_first_mount_center-screw_head_diam/2; //the UPS USB step initial point is just before screw hole
-  antennabigradio = 5;
-  antennalittlediameter = 9;
+  antennaholeradio = 5;
 
 // comment here what you dont want to generate
   //  translate([-40,0,inhibitionzone_height + case_thickness + board_thickness]) rotate([0,270,0]) intersection(){rpi4_case(); topSelector();} // top of case
@@ -57,7 +47,7 @@
   //rpi4andbatt(); // the raspberry pi 4 and associated tolerances
   // here follows all the modules used to generate what you want.
   //mounts();
-  //topSelector();
+  // topSelector();
 module topSelector() 
   translate([-case_thickness,0,0]) {
     difference(){ // this difference selects the top and bottom parts of the case with a small lip for the IO
@@ -67,10 +57,15 @@ module topSelector()
           cube([pil+case_thickness,pid+battd+case_thickness,pin_space+case_thickness]);  // just under top of case (to take the mounts).
         translate([0,-case_thickness,inhibitionzone_height+board_thickness])
           cube([pil+2*case_thickness,pid+battd+2*case_thickness,case_thickness]);  // top top of case 
-        translate([pil-case_int_radio-case_thickness,pid+battd+2*case_thickness-upscardd,inhibitionzone_height_noups+board_thickness-pin_space-case_thickness-1])
-          cube([2*case_thickness+case_int_radio,upscardd-case_thickness,3*case_thickness+pin_space+1]);  // ups corner
-        translate([0,pid+battd+case_thickness,3.6+board_thickness])
+        translate([pil-case_int_radio-case_thickness,pid+battd+2*case_thickness-upscardd,inhibitionzone_height_noups+board_thickness])
+          {
+            cube([3*case_thickness+case_int_radio,upscardd-case_thickness,3*case_thickness+pin_space+4]);  // ups corner
+            translate([0,0,-pin_space]) cube([2*case_thickness+case_int_radio,upscardd-case_thickness,pin_space]); //The mounts
+            }
+        translate([0,pid+battd+case_thickness,3.6+board_thickness]) {
           cube([pil+2*case_thickness,case_thickness,inhibitionzone_height-(3.6)+board_thickness+case_thickness]); // over hdmi side
+          translate([case_thickness,0,0]) rotate([0,90,0]) linear_extrude(height=pil) polygon(points=[[0,0],[0,case_thickness],[case_thickness,0]]); //little angle, to fit well up and down
+          }
         }
       union(){
         cube([case_thickness+2*case_int_radio,18.45+battd+case_thickness,board_thickness+eth_height]); //Over Eth case
@@ -140,10 +135,10 @@ module rpi4() {
           }
         }
       // these are the big surface level components
-        translate([-(2.81+extension),2.15,0]) cube([21.3+extension,16.3,eth_height]);   // Ethernet port Acaba en 18.45
-        translate([-(2.81+extension),22.6,0]) cube([17.44+extension,13.5,usbs_height]);    // USB 3.0     Deja 4.15. Acaba en 36.1
+        translate([-(2.81+extension),2,0]) cube([21.3+extension,17,eth_height]);   // Ethernet port 
+        translate([-(2.81+extension),22.2,0]) cube([17.44+extension,14.2,usbs_height]);    // USB 3.0     Deja 4.15. Acaba en 36.1
         translate([-(2.81+extension),18.6,17.1]) cube([17.44+extension,12,7]);    // Over USB connection to 3G card
-        translate([-(2.81+extension),40.6,0]) cube([17.44+extension,13.5,usbs_height]);  // USB 2.0  Deja 4.5
+        translate([-(2.81+extension),40.4,0]) cube([17.44+extension,13.7,usbs_height]);  // USB 2.0  Deja 4.5
         translate([27.36,1,0]) cube([50.7,5.0,8.6+extension]);                    // GPIO pins
         translate([21,7.15,0]) cube([5.0,5.0,8.6+extension]);                     // Power over ethernet pins
         translate([48.0,16.3,0]) cube([15.0,15.0,2.5]);                           // cpu
@@ -156,8 +151,8 @@ module rpi4() {
         translate([26.9,pid,0]) cube([8.5,extension,6.9]);                // Audio jack
         // other components (not surface ones)
         translate([42,pid,14.5]) cube([14,extension,3]);                         // SIM Card slot       
-        translate([pil,7,boardw2hat_thickness-board_thickness]) cube([extension,3,1.5]);  // UPS button, height similar to UPS USB connector            
-        translate([pil,22.4,-(board_thickness+sd_height)]) cube([extension,11.11,sd_height]); // SD card (poking out)
+        translate([pil,9,boardw2hat_thickness-board_thickness+2]) cube([extension,3,2.5]);  // UPS button, height similar to UPS USB connector            
+        translate([pil,22.4,5-(board_thickness+sd_height)]) cube([extension,11.11,sd_height]); // SD card (poking out)
       // Batt side holes
         holepacing3=14;
         for (n=[0:4]) { // lateral holes
@@ -187,7 +182,7 @@ module rpi4() {
       pins(); // the hole which will be screwed into to put both halves of the case and board together
       }
     }
-  translate([31,upscardd,inhibitionzone_height_noups+board_thickness]) cube([9,case_thickness,5.5]);    // UPS-USB connector, must be after the corner difference 
+  translate([31,upscardd,inhibitionzone_height_noups+board_thickness+3]) cube([9,case_thickness,5.5]);    // UPS-USB connector, must be after the corner difference 
   translate([53,7.8,0]) { // the air holes dont need the first translate and must be after the ups connector corner difference.
     scale([10,1,1]){ // scale 10 of d=5 moves 12.5 less than scale 15
       translate([0,0,-extension-pin_space])  cylinder(extension,d=5, center=false);      // under-side air hole
@@ -205,8 +200,8 @@ module rpi4() {
       translate([0,30+n*holepacing2,inhibitionzone_height_noups]) cylinder(extension+inhibitionzone_height-inhibitionzone_height_noups,d=5, center=false);
     }
   // antenna holes
-  translate([antennabigradio+1,y_antenna_eth_conn,inhibitionzone_height])  cylinder(extension,d=antennalittlediameter, center=false);
-  translate([antennabigradio+1,pid-y_antenna_eth_conn,inhibitionzone_height])  cylinder(extension,d=antennalittlediameter, center=false);
+  translate([antennaholeradio,y_antenna_eth_conn,inhibitionzone_height])  cylinder(extension,d=2*antennaholeradio, center=false);
+  translate([antennaholeradio,pid-y_antenna_eth_conn,inhibitionzone_height])  cylinder(extension,d=2*antennaholeradio, center=false);
   }
 
 module mounts() {

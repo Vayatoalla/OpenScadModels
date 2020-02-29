@@ -1,5 +1,4 @@
 // Comments
-  //
   // Openscad model of a Raspberry pi 4 case with space and holes for pivoyager and pilotiot hats.
   // Original file maintained in https://github.com/Vayatoalla/OpenScadModels
   // Based on a design by George Onoufriou (https://github.com/DreamingRaven/RavenSCAD/blob/master/LICENSE)
@@ -12,16 +11,16 @@
   board_thickness = 1.5; // the space for the board itself only
   boardw1hat_thickness = 15; // the space of the rpi board with the first hat. Will need it for the holes in the card
   boardw2hat_thickness = 28; // the space of the rpi board with two hats. Will need it for the holes in the card
-  inhibitionzone_height_noups =boardw2hat_thickness-board_thickness-4;
+  inhibitionzone_height_noups =boardw2hat_thickness-board_thickness-5;
   pin_space = 3;//2.2; // the min space that the throughhole components require underneath - Height of the mounts (up and down)
-  $fn = 100; // how detailed the circular components are (holes + mounts), not super important
+  $fn = 20; // how detailed the circular components are (holes + mounts), not super important
   extension = 20; // extension to lengths so case can be subtractiveley created
   inhibitionzone_height= 34.5; //inhibition zone for 3g and pivoyager hats
   case_thickness = 2; // sets the case thickness
   pil = 87; // this is the length of the pi board only
   pid = 57; // this is the width / depth of the pi board only
   pih = board_thickness;
-  sd_height = 3; // is how tall the sd card part sticking out
+  sd_height = case_thickness+pin_space+0.5; // is how tall the sd card part sticking out
   mount_pin_height = 2*board_thickness + 2*case_thickness + pin_space + inhibitionzone_height; // this is the most awkward one of the set as it sets the mount point pin size
   // I want a rounded box. I will achieve it using Minkowsky addition
   mink_functs_height = 0.5; //the height we are using in the cylinders, in Minkowsky functions. Not importante, only keep low
@@ -29,12 +28,12 @@
   nuts_height = 2.2; //the height of the nuts holes (and the screw heads)
   // Added Space For Battery And Hats
   battd = 20; //width / depth space for battery
-  upscardd = 29.5; //the UPS board width / depth
+  upscardd = 30.5; //the UPS board width / depth
   eth_height = 13.6;
   usbs_height = 15.6;
   intrabatth = 5; //height of the separation/nerves inserted between battery and the raspberry
   y_antenna_eth_conn = 11; //y axis of the antenna over the eth port (both antennas are symetrical in the y axis).
-  x_to_first_mount_center = 22.2;
+  x_to_first_mount_center = 23;
   mount_diameter = 7;
   screw_head_diam = 5; // screw head hole, will be over the case
   xmountspace = 58.8; //x distance between mounts
@@ -71,7 +70,7 @@ module topSelector()
             }
         translate([0,pid+battd+case_thickness,3.6+board_thickness]) {
           cube([pil+2*case_thickness,case_thickness,inhibitionzone_height-(3.6)+board_thickness+case_thickness]); // over hdmi side
-          translate([case_thickness,0,0]) rotate([0,90,0]) linear_extrude(height=pil) polygon(points=[[0,0],[0,1.5*case_thickness],[case_thickness,0]]); //little angle, to fit well up and down
+          translate([case_thickness,0,0]) rotate([0,90,0]) linear_extrude(height=pil) polygon(points=[[0,0],[0,case_thickness],[1.8*case_thickness,0]]); //little angle, to fit well up and down
           }
         }
       union(){
@@ -151,15 +150,15 @@ module rpi4() {
         translate([48.0,16.3,0]) cube([15.0,15.0,2.5]);                           // cpu
         // translate([67.5,6.8,0]) cube([10.8,13.1,1.8]);                         // onboard wifi
         translate([79,17.3,0]) cube([2.5,22.15,5.4+extension]);                   // display connector
-        translate([69.5,pid,0]) cube([10,extension,4]);                     // USB type C power
-        translate([55.5,pid,0]) cube([8,extension,3.9]);                    // Micro HDMI0
-        translate([41.6,pid,0]) cube([8,extension,3.9]);                    // Micro HDMI1
+        translate([70,pid,0]) cube([10.5,extension,4]);                     // USB type C power
+        translate([56,pid,0]) cube([8.5,extension,3.9]);                    // Micro HDMI0
+        translate([42,pid,0]) cube([8.5,extension,3.9]);                    // Micro HDMI1
         //      translate([37.4,34.1,0]) cube([2.5,22.15,5.4+extension]);         // CSI camera connector, I dont need here
-        translate([26.9,pid,0]) cube([8.5,extension,6.9]);                // Audio jack
+        translate([27.3,pid,0]) cube([8.5,extension,6.9]);                // Audio jack
         // other components (not surface ones)
-        translate([42,pid,14.5]) cube([14,extension,3]);                         // SIM Card slot       
-        translate([pil,9,boardw2hat_thickness-board_thickness+1.5]) cube([extension,3,2.5]);  // UPS button, height similar to UPS USB connector            
-        translate([pil,21,-1.5]) cube([extension,14,sd_height]); // SD card (poking out)
+        translate([42,pid,12.5]) cube([14,extension,3]);                         // SIM Card slot
+        translate([pil,9,boardw2hat_thickness-board_thickness-1.5]) cube([extension,3,2.5]);  // UPS button, height similar to UPS USB connector            
+        translate([pil,21,-(pin_space+case_thickness+board_thickness)]) cube([extension,14,sd_height]); // SD card (poking out)
       // Batt side holes
         holepacing3=14;
         for (n=[0:4]) { // lateral holes
@@ -189,7 +188,7 @@ module rpi4() {
       pins(); // the hole which will be screwed into to put both halves of the case and board together
       }
     }
-  translate([x_upsusbconn,upscardd,inhibitionzone_height_noups+board_thickness+3]) cube([9,case_thickness,5.5]);    // UPS-USB connector, must be after the corner difference 
+  translate([x_upsusbconn,upscardd,inhibitionzone_height_noups+board_thickness]) cube([9,case_thickness,8]);    // UPS-USB connector, must be after the corner difference 
   translate([53,7.8,0]) { // the air holes dont need the first translate and must be after the ups connector corner difference.
     scale([10,1,1]){ // scale 10 of d=5 moves 12.5 less than scale 15
       translate([0,0,-extension-pin_space])  cylinder(extension,d=5, center=false);      // under-side air hole
@@ -208,32 +207,31 @@ module rpi4() {
     }
   // antenna holes
   translate([antennaholeradio,y_antenna_eth_conn,inhibitionzone_height])  cylinder(extension,d=2*antennaholeradio, center=false);
-  translate([antennaholeradio,pid-y_antenna_eth_conn,inhibitionzone_height])  cylinder(extension,d=2*antennaholeradio, center=false);
-  translate([x_step_begin-case_thickness,pid-y_antenna_eth_conn, inhibitionzone_height_noups])  cylinder(2*case_thickness,d=2*antennaholeradio, center=false); // space for antenna connector
+  translate([antennaholeradio,pid-y_antenna_eth_conn-0.6,inhibitionzone_height])  cylinder(extension,d=2*antennaholeradio, center=false);
+  translate([x_step_begin-case_thickness,pid-y_antenna_eth_conn-0.6, inhibitionzone_height_noups]) scale([1,1.5,1]) cylinder(2*case_thickness,d=2*antennaholeradio, center=false); // space for antenna connector
   }
-
 module mounts() {
-  translate([xmounts,ymounts,-(board_thickness+case_thickness)]) {
-    for(n=[0:1]) translate([2.2+78*n,2-battd-board_thickness,0]) cylinder(inhibitionzone_height+board_thickness-pin_space+2,d=mount_diameter+2, center=false); // mount bot-battery
-    for(n=[0:1]) for(m=[0:1]) translate([22.2+58*n,2+49*m,0]) cylinder(pin_space,d=mount_diameter, center=true);     // mount bot-r/l
+  translate([xmounts,ymounts,-(board_thickness+pin_space)]) {
+    for(n=[0:1]) translate([2.2+(20+xmountspace)*n,2-battd-board_thickness,0]) cylinder(inhibitionzone_height+board_thickness,d=mount_diameter+2, center=false); // mount bot-battery
+    for(n=[0:1]) for(m=[0:1]) translate([x_to_first_mount_center+xmountspace*n,2+ymountspace*m,0]) cylinder(pin_space-0.1,d=mount_diameter, center=false);     // mount bot-r/l
     }
-  translate([xmounts,ymounts,inhibitionzone_height-pin_space]) for(n=[0:1]) translate([22.2+58*n,2,0]) cylinder(pin_space,d=mount_diameter, center=false);  // mount top-r
-  translate([xmounts,ymounts,inhibitionzone_height-pin_space]) for(n=[0:1]) translate([2.2+78*n,2-battd-board_thickness,0]) cylinder(pin_space,d=mount_diameter+2, center=false); // mount top batt
-  translate([xmounts,ymounts,inhibitionzone_height-pin_space]) translate([22.2,2+49,0]) cylinder(pin_space,d=mount_diameter, center=false);     // mount top-l near 0x
-  translate([xmounts,ymounts,inhibitionzone_height_noups-pin_space]) translate([22.2+58,2+49,0]) cylinder(pin_space,d=mount_diameter, center=false);     // mount top-l near farest x
+  translate([xmounts,ymounts,inhibitionzone_height-pin_space]) for(n=[0:1]) translate([x_to_first_mount_center+xmountspace*n,2,0]) cylinder(pin_space,d=mount_diameter, center=false);  // mount top-r
+  translate([xmounts,ymounts,inhibitionzone_height-pin_space]) for(n=[0:1]) translate([2.2+(20+xmountspace)*n,2-battd-board_thickness,0]) cylinder(pin_space,d=mount_diameter+2, center=false); // mount top batt
+  translate([xmounts,ymounts,inhibitionzone_height-pin_space]) translate([x_to_first_mount_center,2+ymountspace,0]) cylinder(pin_space,d=mount_diameter, center=false);     // mount top-l near 0x
+  translate([xmounts,ymounts,inhibitionzone_height_noups-pin_space]) translate([x_to_first_mount_center+xmountspace,2+ymountspace,0]) cylinder(pin_space,d=mount_diameter, center=false);     // mount top-l near farest x
   }
 module pins()
   translate([xmounts,ymounts,(0.5*mount_pin_height)-(board_thickness+case_thickness+pin_space)]) {  // this is to move all the pins
-    for(n=[0:1]) for(m=[0:1]) translate([22.2+58*n,2+49*m,0]) cylinder(mount_pin_height,d=3.5, center=true);  // hole top/bot-r/l
-    for(n=[0:1]) translate([2.2+78*n,2-battd-board_thickness,0]) cylinder(mount_pin_height,d=3.5, center=true); // hole top/bot-battd
+    for(n=[0:1]) for(m=[0:1]) translate([x_to_first_mount_center+xmountspace*n,2+ymountspace*m,0]) cylinder(mount_pin_height,d=3.5, center=true);  // hole top/bot-r/l
+    for(n=[0:1]) translate([2.2+(20+xmountspace)*n,2-battd-board_thickness,0]) cylinder(mount_pin_height,d=3.5, center=true); // hole top/bot-battd
     }
 module nuts()
   // Max 6 mm de diameter. The screw may measure 5 mm. The nuts vary from 5.45 to 5.77. Height of the nuts between 1.75 and 2
   translate([xmounts,ymounts,0]) { // this is to move all the nut holes
-    for(n=[0:1]) for(m=[0:1]) translate([x_to_first_mount_center+58*n,2+49*m,-(case_thickness+pin_space)]) linear_extrude(height=nuts_height) circle(d=6.2,$fn=6);
-    for(m=[0:1]) translate([x_to_first_mount_center+58*m,2,(inhibitionzone_height+board_thickness+case_thickness)-nuts_height]) linear_extrude(height=nuts_height) circle(d=screw_head_diam);
-    translate([x_to_first_mount_center,2+49,(inhibitionzone_height+board_thickness+case_thickness)-nuts_height]) linear_extrude(height=nuts_height) circle(d=screw_head_diam);
-    translate([x_to_first_mount_center+58,2+49,(inhibitionzone_height_noups+board_thickness+case_thickness)-nuts_height]) linear_extrude(height=nuts_height) circle(d=screw_head_diam);
-    for(n=[0:1]) translate([2.2+78*n,2-battd-board_thickness,-(case_thickness+pin_space)]) linear_extrude(height=(inhibitionzone_height-0.5*pin_space)+case_thickness, center=false) circle(d=6.2,$fn=6);
-    for(m=[0:1]) translate([2.2+78*m,2-battd-board_thickness,(inhibitionzone_height+board_thickness+case_thickness)-nuts_height]) linear_extrude(height=nuts_height) circle(d=screw_head_diam);
+    for(n=[0:1]) for(m=[0:1]) translate([x_to_first_mount_center+xmountspace*n,2+ymountspace*m,-(case_thickness+pin_space)]) linear_extrude(height=nuts_height) circle(d=6.2,$fn=6);
+    for(n=[0:1]) translate([x_to_first_mount_center+xmountspace*n,2,(inhibitionzone_height+board_thickness+case_thickness)-nuts_height]) linear_extrude(height=nuts_height) circle(d=screw_head_diam);
+    translate([x_to_first_mount_center,2+ymountspace,(inhibitionzone_height+board_thickness+case_thickness)-nuts_height]) linear_extrude(height=nuts_height) circle(d=screw_head_diam);
+    translate([x_to_first_mount_center+58,2+ymountspace,(inhibitionzone_height_noups+board_thickness+case_thickness)-nuts_height]) linear_extrude(height=nuts_height) circle(d=screw_head_diam);
+    for(n=[0:1]) translate([2.2+(20+xmountspace)*n,2-battd-board_thickness,-(case_thickness+pin_space)]) linear_extrude(height=(inhibitionzone_height-0.5*pin_space)+case_thickness, center=false) circle(d=6.2,$fn=6);
+    for(n=[0:1]) translate([2.2+(20+xmountspace)*n,2-battd-board_thickness,(inhibitionzone_height+board_thickness+case_thickness)-nuts_height]) linear_extrude(height=nuts_height) circle(d=screw_head_diam);
     }

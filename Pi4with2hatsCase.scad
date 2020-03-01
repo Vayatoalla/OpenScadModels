@@ -53,7 +53,7 @@
   //rpi4andbatt(); // the raspberry pi 4 and associated tolerances
   // here follows all the modules used to generate what you want.
   //mounts();
-  // topSelector();
+  //topSelector();
 module topSelector() 
   translate([-case_thickness,0,0]) {
     difference(){ // this difference selects the top and bottom parts of the case with a small lip for the IO
@@ -63,10 +63,10 @@ module topSelector()
           cube([pil+case_thickness,pid+battd+case_thickness,pin_space+case_thickness]);  // just under top of case (to take the mounts).
         translate([0,-case_thickness,inhibitionzone_height+board_thickness])
           cube([pil+2*case_thickness,pid+battd+2*case_thickness,case_thickness]);  // top top of case 
-        translate([pil-case_int_radio-case_thickness,pid+battd+2*case_thickness-upscardd,inhibitionzone_height_noups+board_thickness])
+        translate([pil-case_int_radio-case_thickness,battd+case_thickness+upscardd,inhibitionzone_height_noups+board_thickness])
           {
-            cube([3*case_thickness+case_int_radio,upscardd-case_thickness,3*case_thickness+pin_space+4]);  // ups corner
-            translate([0,0,-pin_space]) cube([2*case_thickness+case_int_radio,upscardd-case_thickness,pin_space]); //The mounts
+            cube([3*case_thickness+case_int_radio,pid-upscardd,3*case_thickness+pin_space+4]);  // ups corner
+            translate([0,0,-pin_space]) cube([2*case_thickness+case_int_radio,pid-upscardd,pin_space]); //The mounts
             }
         translate([0,pid+battd+case_thickness,3.6+board_thickness]) {
           cube([pil+2*case_thickness,case_thickness,inhibitionzone_height-(3.6)+board_thickness+case_thickness]); // over hdmi side
@@ -159,6 +159,24 @@ module rpi4() {
         translate([42,pid,12.5]) cube([14,extension,3]);                         // SIM Card slot
         translate([pil,9,boardw2hat_thickness-board_thickness-1.5]) cube([extension,3,2.5]);  // UPS button, height similar to UPS USB connector            
         translate([pil,21,-(pin_space+case_thickness+board_thickness)]) cube([extension,14,sd_height]); // SD card (poking out)
+      //YASPIT holes
+        ld = 1.5; //letter diameter
+        gs = 10; //greater scale
+        ms = 5; //middle scale
+        ls = 3; //liettle scale
+        translate([pil,-10,13]) rotate ([-30,0,0]) scale ([1,1,gs]) rotate([0,90,0]) cylinder(extension,d=ld, center=false);
+        translate([pil,-11,17]) rotate ([0,0,0]) scale ([1,1,ls]) rotate([0,90,0]) cylinder(extension,d=ld, center=false);
+        translate([pil,-5,13]) rotate ([-30,0,0]) scale ([1,1,gs]) rotate([0,90,0]) cylinder(extension,d=ld, center=false);
+        translate([pil,-1.5,13]) rotate ([0,0,0]) scale ([1,1,gs-1]) rotate([0,90,0]) cylinder(extension,d=ld, center=false);
+        translate([pil,3,9]) rotate ([-45,0,0]) scale ([1,1,ms]) rotate([0,90,0]) cylinder(extension,d=ld, center=false);
+        translate([pil,4,13]) rotate ([15,0,0]) scale ([1,1,ls]) rotate([0,90,0]) cylinder(extension,d=ld, center=false);
+        translate([pil,5,17]) rotate ([-45,0,0]) scale ([1,1,ms]) rotate([0,90,0]) cylinder(extension,d=ld, center=false);
+        translate([pil,9,13]) rotate ([-30,0,0]) scale ([1,1,gs]) rotate([0,90,0]) cylinder(extension,d=ld, center=false);
+        translate([pil+1,10.5,15.5]) rotate([0,90,0]) rotate_extrude(angle=160) translate([3.5,0,0]) square(size=[1,case_thickness], center=true);
+        translate([pil,17,13]) rotate ([-30,0,0]) scale ([1,1,gs]) rotate([0,90,0]) cylinder(extension,d=ld, center=false);
+        translate([pil,23,13]) rotate ([-30,0,0]) scale ([1,1,gs]) rotate([0,90,0]) cylinder(extension,d=ld, center=false);
+        translate([pil,25,16]) rotate ([-60,0,0]) scale ([1,1,ms]) rotate([0,90,0]) cylinder(extension,d=ld, center=false);
+
       // Batt side holes
         holepacing3=14;
         for (n=[0:4]) { // lateral holes
